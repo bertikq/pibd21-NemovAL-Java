@@ -143,5 +143,6 @@ public class JWindow {
 		bus = new Bus(busPanel.getWidth() / 2, busPanel.getHeight() / 2,Color.BLACK, Color.GREEN, 15, TypeDoors.One, Color.RED);
 		bus.SetSizeWindow(busPanel.getWidth(), busPanel.getHeight());
 		busPanel.setBus(bus);
+		Draw();
 	}
 }

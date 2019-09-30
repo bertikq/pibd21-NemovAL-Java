@@ -31,4 +31,8 @@ public class DrawDoors {
 			break;
 		}
 	}
+
+	public void setTypeDoors(TypeDoors typeDoors) {
+		this.typeDoors = typeDoors;
+	}
 }
