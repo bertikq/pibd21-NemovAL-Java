@@ -19,14 +19,14 @@ public class Bus {
     public int countPeople;
     public String NameDriver;
     
-    public Bus(int posX, int posY, Color colorBody, Color colorWings, int speed, TypeDoors typeDoors, Color colorDoor)
+    public Bus(int posX, int posY, Color colorBody, Color colorWings, int speed, DrawDoors drawDoors)
     {
         this.posX = posX;
         this.posY = posY;
         this.colorBody = colorBody;
         this.colorWings = colorWings;
         this.speed = speed;
-        drawDoors = new DrawDoors(typeDoors, colorDoor);
+        this.drawDoors = drawDoors;
         radWheel = 15;
     }
     public void Move(Direction dir)

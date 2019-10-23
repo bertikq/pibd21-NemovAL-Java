@@ -11,7 +11,7 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Panel;
 
-public class JWindow {
+public class BusApp {
 
 	private JFrame frmBus;
 	Bus bus;
@@ -24,7 +24,7 @@ public class JWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					JWindow window = new JWindow();
+					BusApp window = new BusApp();
 					window.frmBus.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -36,7 +36,7 @@ public class JWindow {
 	/**
 	 * Create the application.
 	 */
-	public JWindow() {
+	public BusApp() {
 		initialize();
 	}
 
@@ -140,7 +140,7 @@ public class JWindow {
 	}
 	
 	private void CreateBus() {
-		bus = new Bus(busPanel.getWidth() / 2, busPanel.getHeight() / 2,Color.BLACK, Color.GREEN, 15, TypeDoors.One, Color.RED);
+		bus = new Bus(busPanel.getWidth() / 2, busPanel.getHeight() / 2,Color.BLACK, Color.GREEN, 15, new DrawDoors(TypeDoors.One, Color.RED));
 		bus.SetSizeWindow(busPanel.getWidth(), busPanel.getHeight());
 		busPanel.setBus(bus);
 		Draw();

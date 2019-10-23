@@ -11,7 +11,6 @@ public class BusPanel extends JPanel {
 		this.bus = bus;
 	}
 
-
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
