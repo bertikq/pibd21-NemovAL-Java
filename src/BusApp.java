@@ -14,7 +14,7 @@ import java.awt.Panel;
 public class BusApp {
 
 	private JFrame frmBus;
-	Bus bus;
+	ITransport bus;
 	BusPanel busPanel;
 
 	/**
@@ -53,11 +53,20 @@ public class BusApp {
 		JButton buttonCreateBus = new JButton("Create Bus\r\n");
 		buttonCreateBus.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				CreateBus();
+				CreateBaseBus();
 			}
 		});
 		buttonCreateBus.setBounds(44, 40, 111, 41);
 		frmBus.getContentPane().add(buttonCreateBus);
+		
+		JButton btnCreateBusWithaccord = new JButton("Create Bus\r\nWithAccord");
+		btnCreateBusWithaccord.setBounds(187, 41, 171, 41);
+		frmBus.add(btnCreateBusWithaccord);
+		btnCreateBusWithaccord.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CreateBusWithAccord();
+			}
+		});
 		
 		JButton btnRight = new JButton("btnRight");
 		btnRight.addActionListener(new ActionListener() {
@@ -108,7 +117,8 @@ public class BusApp {
 				busPanel.setBounds(new Rectangle(0, 0, 528, 389));
 				frmBus.getContentPane().add(busPanel);
 				busPanel.setLayout(null);
-		
+				
+				
 	}
 	
 	private void Move(JButton button) {
@@ -139,9 +149,16 @@ public class BusApp {
 		busPanel.repaint();
 	}
 	
-	private void CreateBus() {
-		bus = new Bus(busPanel.getWidth() / 2, busPanel.getHeight() / 2,Color.BLACK, Color.GREEN, 15, new DrawDoors(TypeDoors.One, Color.RED));
-		bus.SetSizeWindow(busPanel.getWidth(), busPanel.getHeight());
+	private void CreateBaseBus() {
+        bus = new BaseBus(15, Color.BLACK, 15, Color.RED, new DrawBaseExtraFunc(), TypeDoors.Three, Color.BLACK);
+        bus.SetPosition(frmBus.getWidth() / 2, frmBus.getHeight() / 2, frmBus.getWidth(), frmBus.getHeight());
+		busPanel.setBus(bus);
+		Draw();
+	}
+	
+	private void CreateBusWithAccord() {
+        bus = new BusWithAccord(15, Color.BLACK, 15, Color.RED, Color.GREEN, 40, 2, 100, new DrawDoorsOval(), TypeDoors.Two, Color.BLACK);
+        bus.SetPosition(frmBus.getWidth() / 2, frmBus.getHeight() / 2, frmBus.getWidth(), frmBus.getHeight());
 		busPanel.setBus(bus);
 		Draw();
 	}
