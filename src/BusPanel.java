@@ -4,10 +4,10 @@ import javax.swing.JPanel;
 
 public class BusPanel extends JPanel {
 	
-	private Bus bus;
+	private ITransport bus;
 
 
-	public void setBus(Bus bus) {
+	public void setBus(ITransport bus) {
 		this.bus = bus;
 	}
 
@@ -15,7 +15,7 @@ public class BusPanel extends JPanel {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (bus != null)
-			bus.DrawBus(g);
+			bus.Draw(g);
 	}
 	
 }
