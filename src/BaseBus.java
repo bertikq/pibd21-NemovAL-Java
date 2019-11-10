@@ -22,6 +22,10 @@ public class BaseBus extends Vehicle {
 		this.typeDoors = typeDoors;
 		this.extraColor = extraColor;
 	}
+	
+	public void setExtraFunc(IExtraFunc extraFunc) {
+		this.extraFunc = extraFunc;
+	}
 
 	@Override
 	public void Move(Direction direction) {
