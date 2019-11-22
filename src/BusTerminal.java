@@ -36,6 +36,18 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         }
         return -1;
     }
+    
+    public boolean BolsheRavno(BusTerminal<ITransport, IExtraFunc> term) {
+    	if (places.length >= term.places.length)
+    		return true;
+    	return false;
+    }
+    
+    public boolean MensheRavno(BusTerminal<ITransport, IExtraFunc> term) {
+    	if(places.length <= term.places.length)
+    		return true;
+    	return false;
+    }
 
     public T Remove(int index)
     {
