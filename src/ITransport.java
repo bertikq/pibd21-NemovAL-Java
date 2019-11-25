@@ -7,4 +7,5 @@ public interface ITransport {
 	void Move(Direction direction);
 	
 	void Draw(Graphics g);
+	
 }
