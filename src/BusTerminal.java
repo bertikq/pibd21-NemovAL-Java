@@ -1,36 +1,45 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.lang.reflect.Array;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
-	private T[] places;
+	
+	public Map<Integer, T> places;
     
     private int WidthWindow;
     private int HeightWindow;
+    
+    private int maxCount;
 
     private final int widthSizePlace = 200;
     private final int heightSizePlace = 50;
     
 	public BusTerminal(int size, int widthWindow, int heightWindow)
     {
-        places = (T[])new ITransport[size];
+        places = new HashMap<Integer, T>();
         WidthWindow = widthWindow;
         HeightWindow = heightWindow;
-        for (int i = 0; i < places.length; i++) {
-            places[i] = null;
-        }
+        maxCount = size;
     }
 
     public int Add(T bus, U extraFunc)
     {
-        for (int i = 0; i < places.length; i++)
+		if (places.size() == maxCount)
+		{
+			return -1;
+	    }
+        for (int i = 0; i < maxCount; i++)
         {
             if (CheckFreePlace(i))
             {
+            	places.put(i, bus);
                 bus.SetPosition(widthSizePlace / 2 + i / 5 * widthSizePlace + 5 - 50, i % 5 * heightSizePlace + heightSizePlace / 2,
                     WidthWindow, HeightWindow);
                 ((BaseBus)bus).setExtraFunc(extraFunc);
-                places[i] = bus;
+                places.replace(i, bus);
                 return i;
             }
         }
@@ -38,40 +47,36 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     }
     
     public boolean BolsheRavno(BusTerminal<ITransport, IExtraFunc> term) {
-    	if (places.length >= term.places.length)
+    	if (places.size() >= term.places.size())
     		return true;
     	return false;
     }
     
     public boolean MensheRavno(BusTerminal<ITransport, IExtraFunc> term) {
-    	if(places.length <= term.places.length)
+    	if(places.size() <= term.places.size())
     		return true;
     	return false;
     }
 
     public T Remove(int index)
     {
-        if (index < 0 || index > places.length)
-            return null;
         if (!CheckFreePlace(index))
         {
-            T bus = places[index];
-            places[index] = null;
+            T bus = places.get(index);
+            places.replace(index, null);
             return bus;
         }
         return null;
     }
-    
-    //create two methods
 
     public void Draw(Graphics g)
     {
         DrawMarking(g);
-        for (int i = 0; i < places.length; i++)
+        for (int i = 0; i < places.size(); i++)
         {
             if (!CheckFreePlace(i))
             {
-                places[i].Draw(g);
+                places.get(i).Draw(g);
             }
         }
     }
@@ -79,8 +84,8 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     private void DrawMarking(Graphics g)
     {
         g.setColor(Color.BLACK);
-        g.drawRect(0, 0, (places.length / 5) * widthSizePlace, 480);
-        for (int i = 0; i < places.length / 5; i++)
+        g.drawRect(0, 0, (maxCount / 5) * widthSizePlace, 480);
+        for (int i = 0; i < maxCount / 5; i++)
         {
             for (int j = 0; j < 6; ++j)
             {
@@ -93,6 +98,6 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
 
     private boolean CheckFreePlace(int indexPlace)
     {
-        return places[indexPlace] == null;
+        return places.get(indexPlace) == null;
     } 
 }

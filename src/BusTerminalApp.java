@@ -2,12 +2,18 @@ import java.awt.EventQueue;
 import java.awt.JobAttributes.DialogType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dialog;
 
 import javax.print.attribute.standard.SheetCollate;
 import javax.swing.GroupLayout;
@@ -15,11 +21,18 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.JToolBar;
+import javax.swing.ListModel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextPane;
 import javax.swing.JTextField;
 import javax.swing.JTextArea;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.AbstractListModel;
+import javax.swing.DefaultListModel;
 public class BusTerminalApp {
 
 	private JFrame frame;
@@ -27,7 +40,14 @@ public class BusTerminalApp {
 	BusParkingPanel drawPanel;
 	BusPanel getBusPanel;
 	
-	public BusTerminal<ITransport, IExtraFunc> busTerminal;
+	JList list;
+	
+	private JPanel panel;
+	private JButton pakingBusAccord;
+	private JButton parkingBaseBus;
+	MultiLevelParking levelTerminal;
+	private final int countLevel = 5;
+	private HashSet<ITransport> hashSetBus = new HashSet<ITransport>();
 
 	/**
 	 * Launch the application.
@@ -50,48 +70,84 @@ public class BusTerminalApp {
 	 */
 	public BusTerminalApp() {
 		initialize();
-		busTerminal = new BusTerminal<ITransport, IExtraFunc>(10, drawPanel.getWidth(), drawPanel.getHeight());
-		drawPanel.setBusTerminal(busTerminal);
+		levelTerminal = new MultiLevelParking(countLevel, drawPanel.getWidth(), drawPanel.getHeight());
+		frame.getContentPane().setLayout(null);
+		frame.getContentPane().add(drawPanel);
+		frame.getContentPane().add(panel);
+		frame.getContentPane().add(pakingBusAccord);
+		frame.getContentPane().add(parkingBaseBus);
+		
+		list = new JList();
+		DefaultListModel dlm = new DefaultListModel();
+		for (int i = 0; i < countLevel; i++)
+			dlm.addElement("Уровень " + i);
+		list.setBounds(569, 13, 309, 154);
+		frame.getContentPane().add(list);
+		list.setModel(dlm);
+		list.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent evt) {
+		        if (evt.getClickCount() == 2) {
+		        	ListBoxLevels_SelectedIndexChanged();
+		        }
+			}
+		});
 	}
 	
+	private void ListBoxLevels_SelectedIndexChanged()
+    {
+        Draw();
+    }
+	
 	private void Draw() {
+		drawPanel.setBusTerminal(levelTerminal.getBusTerminal(list.getSelectedIndex()));
 		drawPanel.validate();
 		drawPanel.repaint();
 	}
 	
 	private void ParkingBaseBus() {
-		JColorChooser colorChooser = new JColorChooser();
-		Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
-		BaseBus bus = new BaseBus(15, mainColor, 15, Color.RED, new DrawBaseExtraFunc(), TypeDoors.Three, Color.BLACK);
-		busTerminal.Add(bus, new DrawDoorsOval());
-		Draw();
+		if (list.getSelectedIndex() > -1)
+        {
+			JColorChooser colorChooser = new JColorChooser();
+			Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
+			BaseBus bus = new BaseBus(15, mainColor, 15, Color.RED, new DrawBaseExtraFunc(), TypeDoors.Three, Color.BLACK);
+			int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(bus, new DrawBaseExtraFunc());
+			Draw();
+        }
 	}
 	private void ParkingBusAccord() {
-		JColorChooser colorChooser = new JColorChooser();
-		Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
-		Color extraColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
-		BusWithAccord bus = new BusWithAccord(15, Color.BLACK, 15, Color.RED, Color.GREEN, 40, 2, 50, new DrawDoorsOval(), TypeDoors.Two, extraColor);
-		busTerminal.Add(bus, new DrawBaseExtraFunc());
-		Draw();
+		if (list.getSelectedIndex() > -1)
+        {
+			JColorChooser colorChooser = new JColorChooser();
+			Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
+			Color extraColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
+			BusWithAccord bus = new BusWithAccord(15, Color.BLACK, 15, Color.RED, Color.GREEN, 40, 2, 50, new DrawDoorsOval(), TypeDoors.Two, extraColor);
+			int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(bus, new DrawDoorsOval());
+			Draw();
+        }
 	}
 	
 	private void GetCar() {
-		if (inputText.getText() != "")
-        {
-            ITransport car = busTerminal.Remove(Integer.parseInt(inputText.getText()));
-            if (car != null)
-            {
-                car.SetPosition(getBusPanel.getWidth() / 2 - 30, getBusPanel.getHeight() / 2, getBusPanel.getWidth(),
-                		getBusPanel.getHeight());
-                getBusPanel.setBus(car);
-            }
-            else
-            {
-            	getBusPanel.setBus(null);
-            }
-            getBusPanel.validate();
-            getBusPanel.repaint();
-            Draw();
+		
+		if (list.getSelectedIndex() > -1)        
+		{
+			if (inputText.getText() != "")
+	        {
+	            ITransport car = levelTerminal.getBusTerminal(list.getSelectedIndex()).Remove(Integer.parseInt(inputText.getText()));
+	            if (car != null)
+	            {
+	                car.SetPosition(getBusPanel.getWidth() / 2 - 30, getBusPanel.getHeight() / 2, getBusPanel.getWidth(),
+	                		getBusPanel.getHeight());
+	                getBusPanel.setBus(car);
+	                hashSetBus.add(car); // HashSet
+	            }
+	            else
+	            {
+	            	getBusPanel.setBus(null);
+	            }
+	            getBusPanel.validate();
+	            getBusPanel.repaint();
+	            Draw();
+	        }
         }
 	}
 
@@ -104,10 +160,13 @@ public class BusTerminalApp {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		 
 		drawPanel = new BusParkingPanel();
+		drawPanel.setBounds(0, 0, 557, 599);
 		
-		JButton parkingBaseBus = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441");
+		parkingBaseBus = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441");
+		parkingBaseBus.setBounds(564, 180, 314, 62);
 		
-		JButton pakingBusAccord = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441\r\n \u0441 \u0433\u0430\u0440\u043C\u043E\u0448\u043A\u043E\u0439");
+		pakingBusAccord = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441\r\n \u0441 \u0433\u0430\u0440\u043C\u043E\u0448\u043A\u043E\u0439");
+		pakingBusAccord.setBounds(564, 249, 314, 68);
 		
 		parkingBaseBus.addActionListener(new ActionListener() {
 			
@@ -125,31 +184,8 @@ public class BusTerminalApp {
 			}
 		});
 		
-		JPanel panel = new JPanel();
-		GroupLayout groupLayout = new GroupLayout(frame.getContentPane());
-		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addComponent(drawPanel, GroupLayout.PREFERRED_SIZE, 557, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-						.addComponent(parkingBaseBus, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-						.addComponent(pakingBusAccord, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
-					.addContainerGap())
-		);
-		groupLayout.setVerticalGroup(
-			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(drawPanel, GroupLayout.PREFERRED_SIZE, 599, GroupLayout.PREFERRED_SIZE)
-				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(parkingBaseBus, GroupLayout.PREFERRED_SIZE, 62, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(pakingBusAccord, GroupLayout.PREFERRED_SIZE, 68, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 262, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-		);
+		panel = new JPanel();
+		panel.setBounds(564, 324, 314, 262);
 		panel.setLayout(null);
 		
 		JTextPane textPane = new JTextPane();
@@ -178,6 +214,5 @@ public class BusTerminalApp {
 		});
 		getBus.setBounds(106, 68, 117, 25);
 		panel.add(getBus);
-		frame.getContentPane().setLayout(groupLayout);
 	}
 }
