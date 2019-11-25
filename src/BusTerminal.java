@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
 	
-	public Map<Integer, T> places;
+	private Map<Integer, T> places;
     
     private int WidthWindow;
     private int HeightWindow;
@@ -99,5 +99,9 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     private boolean CheckFreePlace(int indexPlace)
     {
         return places.get(indexPlace) == null;
-    } 
+    }
+    
+    public ITransport getTransport(int ind) {
+		return places.get(ind);
+    }
 }

@@ -25,11 +25,13 @@ public class MultiLevelParking {
     }
     
     public ITransport getBus(int indTerminal, int indVehicle){
+    	
     	if (indTerminal > -1 && indTerminal < terminalStages.size())
         {
-            return terminalStages.get(indTerminal).places.get(indVehicle);
+			return terminalStages.get(indTerminal).getTransport(indVehicle);
         }
         return null;
+        
     }
     
 }
