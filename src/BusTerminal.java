@@ -44,7 +44,7 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     }
     
     public boolean MensheRavno(BusTerminal<ITransport, IExtraFunc> term) {
-    	if(places.length <= term.places.length)
+    	if (places.length <= term.places.length)
     		return true;
     	return false;
     }
