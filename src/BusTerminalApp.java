@@ -1,4 +1,5 @@
 import java.awt.EventQueue;
+import javax.swing.JOptionPane; 
 import java.awt.JobAttributes.DialogType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,8 +44,7 @@ public class BusTerminalApp {
 	JList list;
 	
 	private JPanel panel;
-	private JButton pakingBusAccord;
-	private JButton parkingBaseBus;
+	private JButton createBus;
 	MultiLevelParking levelTerminal;
 	private final int countLevel = 5;
 	private HashSet<ITransport> hashSetBus = new HashSet<ITransport>();
@@ -74,8 +74,7 @@ public class BusTerminalApp {
 		frame.getContentPane().setLayout(null);
 		frame.getContentPane().add(drawPanel);
 		frame.getContentPane().add(panel);
-		frame.getContentPane().add(pakingBusAccord);
-		frame.getContentPane().add(parkingBaseBus);
+		frame.getContentPane().add(createBus);
 		
 		list = new JList();
 		DefaultListModel dlm = new DefaultListModel();
@@ -111,17 +110,6 @@ public class BusTerminalApp {
 			Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
 			BaseBus bus = new BaseBus(15, mainColor, 15, Color.RED, new DrawBaseExtraFunc(), TypeDoors.Three, Color.BLACK);
 			int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(bus, new DrawBaseExtraFunc());
-			Draw();
-        }
-	}
-	private void ParkingBusAccord() {
-		if (list.getSelectedIndex() > -1)
-        {
-			JColorChooser colorChooser = new JColorChooser();
-			Color mainColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
-			Color extraColor = colorChooser.showDialog(new Component() {}, "Color", Color.BLACK);
-			BusWithAccord bus = new BusWithAccord(15, Color.BLACK, 15, Color.RED, Color.GREEN, 40, 2, 50, new DrawDoorsOval(), TypeDoors.Two, extraColor);
-			int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(bus, new DrawDoorsOval());
 			Draw();
         }
 	}
@@ -162,27 +150,29 @@ public class BusTerminalApp {
 		drawPanel = new BusParkingPanel();
 		drawPanel.setBounds(0, 0, 557, 599);
 		
-		parkingBaseBus = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441");
-		parkingBaseBus.setBounds(564, 180, 314, 62);
+		createBus = new JButton("\u0417\u0430\u043A\u0430\u0437\u0430\u0442\u044C");
+		createBus.setBounds(564, 249, 314, 62);
 		
-		pakingBusAccord = new JButton("\u041F\u0440\u0438\u043F\u0430\u0440\u043A\u043E\u0432\u0430\u0442\u044C \u0430\u0432\u0442\u043E\u0431\u0443\u0441\r\n \u0441 \u0433\u0430\u0440\u043C\u043E\u0448\u043A\u043E\u0439");
-		pakingBusAccord.setBounds(564, 249, 314, 68);
-		
-		parkingBaseBus.addActionListener(new ActionListener() {
-			
+		createBus.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ParkingBaseBus();
+				FormBusConfig config = new FormBusConfig(new CarDelegate() {
+					@Override
+					public void Invoke(ITransport transport) {
+						if (transport != null && list.getSelectedIndex() > -1) {
+							int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(transport);
+							if (place > -1)
+								Draw();
+							else
+								JOptionPane.showMessageDialog(null,"Машину не удалось поставить");
+						}
+					}
+				});
+				config.getFrame().setVisible(true);
 			}
 		});
 		
-		pakingBusAccord.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ParkingBusAccord();
-			}
-		});
+						
 		
 		panel = new JPanel();
 		panel.setBounds(564, 324, 314, 262);
