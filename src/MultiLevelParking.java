@@ -81,6 +81,8 @@ public class MultiLevelParking {
     
     public boolean SaveLvl(String filename, int numLvl) throws IOException
     {
+    	if (numLvl > terminalStages.size() || numLvl < 0)
+    		return false;
     	File file = new File(filename);
         if (file.exists())
         {
@@ -105,11 +107,16 @@ public class MultiLevelParking {
 		            }
 		        }
         }
+        catch (Exception e) {
+        	return false;
+		}
         return true;
     }
     
     public boolean LoadLvl(String filename, int numLvl) throws NumberFormatException, IOException
     {
+    	if (numLvl > terminalStages.size() || numLvl < 0)
+    		return false;
     	File file = new File(filename);
         if (!file.exists())
         {
@@ -137,6 +144,9 @@ public class MultiLevelParking {
 	            terminalStages.get(numLvl).setPlace(Integer.parseInt(line.split(":")[0]), bus);
 	        	}
         }
+        catch (Exception e) {
+        	return false;
+		}
         return true;
     }
     
