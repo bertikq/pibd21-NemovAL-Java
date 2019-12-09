@@ -1,4 +1,8 @@
 import java.awt.EventQueue;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.HeadlessException;
+
 import javax.swing.JOptionPane; 
 import java.awt.JobAttributes.DialogType;
 import java.awt.event.ActionEvent;
@@ -6,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -15,6 +20,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.DisplayMode;
 
 import javax.print.attribute.standard.SheetCollate;
 import javax.swing.GroupLayout;
@@ -34,6 +40,9 @@ import javax.swing.JList;
 import javax.swing.ListSelectionModel;
 import javax.swing.AbstractListModel;
 import javax.swing.DefaultListModel;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JMenu;
 public class BusTerminalApp {
 
 	private JFrame frame;
@@ -48,6 +57,12 @@ public class BusTerminalApp {
 	MultiLevelParking levelTerminal;
 	private final int countLevel = 5;
 	private HashSet<ITransport> hashSetBus = new HashSet<ITransport>();
+	private JMenuBar menuBar;
+	private JMenu menuSelect;
+	private JMenuItem btnSave;
+	private JMenuItem btnLoad;
+	private JMenuItem btnSaveLvl;
+	private JMenuItem btnLoadLvl;
 
 	/**
 	 * Launch the application.
@@ -83,6 +98,69 @@ public class BusTerminalApp {
 		list.setBounds(569, 13, 309, 154);
 		frame.getContentPane().add(list);
 		list.setModel(dlm);
+		
+		menuBar = new JMenuBar();
+		frame.setJMenuBar(menuBar);
+		
+		menuSelect = new JMenu("\u0424\u0430\u0439\u043B");
+		menuBar.add(menuSelect);
+		
+		btnSave = new JMenuItem("\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C");
+		btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					SaveToolStripMenuItem_Click();
+				} catch (HeadlessException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		menuSelect.add(btnSave);
+		
+		btnLoad = new JMenuItem("\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C");
+		btnLoad.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					LoadToolStripMenuItem_Click();
+				} catch (NumberFormatException | HeadlessException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		menuSelect.add(btnLoad);
+		
+		btnSaveLvl = new JMenuItem("\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0443\u0440\u043E\u0432\u0435\u043D\u044C");
+		btnSaveLvl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					SaveLvl();
+				} catch (NumberFormatException | HeadlessException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		menuSelect.add(btnSaveLvl);
+		
+		btnLoadLvl = new JMenuItem("\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0443\u0440\u043E\u0432\u0435\u043D\u044C");
+		btnLoadLvl.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					LoadLvl();
+				} catch (NumberFormatException | HeadlessException | IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		menuSelect.add(btnLoadLvl);
+		
 		list.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
 		        if (evt.getClickCount() == 2) {
@@ -91,6 +169,84 @@ public class BusTerminalApp {
 			}
 		});
 	}
+	
+	private void SaveToolStripMenuItem_Click() throws HeadlessException, IOException
+    {
+        FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+        fileDialog.setVisible(true);
+        if (fileDialog.getFile() != null)
+        {
+            if (levelTerminal.SaveData(fileDialog.getDirectory() + fileDialog.getFile()))
+            {
+				JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
+            }
+            else
+            {
+				JOptionPane.showMessageDialog(null,"Не сохранилось");
+            }
+        }
+    }
+	
+	private void SaveLvl() throws HeadlessException, IOException {
+		FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+		fileDialog.setVisible(true);
+		if (fileDialog.getFile() != null)
+		{
+		    if (levelTerminal.SaveLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex()))
+		    {
+				JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
+		    }
+		    else
+		    {
+				JOptionPane.showMessageDialog(null,"Не сохранилось");
+		    }
+		}
+	}
+	
+	private void LoadLvl() throws HeadlessException, IOException {
+		FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
+        fileDialog.setVisible(true);
+        if (fileDialog.getFile() != null)
+        {
+            try {
+				if (levelTerminal.LoadLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex()))
+				{
+					JOptionPane.showMessageDialog(null,"Загрузили");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,"Не сохранилось");
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            Draw();
+        }
+	}
+	
+	private void LoadToolStripMenuItem_Click() throws NumberFormatException, HeadlessException, IOException
+    {
+        FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
+        fileDialog.setVisible(true);
+        if (fileDialog.getFile() != null)
+        {
+            try {
+				if (levelTerminal.LoadData(fileDialog.getDirectory() + fileDialog.getFile()))
+				{
+					JOptionPane.showMessageDialog(null,"Загрузили");
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(null,"Не сохранилось");
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            Draw();
+        }
+    }
 	
 	private void ListBoxLevels_SelectedIndexChanged()
     {

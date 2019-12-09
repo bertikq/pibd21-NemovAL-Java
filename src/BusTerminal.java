@@ -25,6 +25,27 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         maxCount = size;
     }
 	
+	public T getPlace(int ind) {
+		if (places.containsKey(ind))
+        {
+            return places.get(ind);
+        }
+        return null;
+	}
+	
+	/**
+	 * @param bus
+	 * @return
+	 */
+	public void setPlace(int ind, T value) {
+		if (CheckFreePlace(ind))
+        {
+            places.put(ind, value);
+            places.get(ind).SetPosition(widthSizePlace / 2 + ind / 5 * widthSizePlace + 5 - 50, 
+                ind % 5 * heightSizePlace + heightSizePlace / 2, WidthWindow, HeightWindow);
+        }
+	}
+	
 	public int Add(T bus)
     {
 		if (places.size() == maxCount)
