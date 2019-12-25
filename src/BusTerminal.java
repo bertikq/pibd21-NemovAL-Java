@@ -24,6 +24,26 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         HeightWindow = heightWindow;
         maxCount = size;
     }
+	
+	public int Add(T bus)
+    {
+		if (places.size() == maxCount)
+		{
+			return -1;
+	    }
+        for (int i = 0; i < maxCount; i++)
+        {
+            if (CheckFreePlace(i))
+            {
+            	places.put(i, bus);
+                bus.SetPosition(widthSizePlace / 2 + i / 5 * widthSizePlace + 5 - 50, i % 5 * heightSizePlace + heightSizePlace / 2,
+                    WidthWindow, HeightWindow);
+                places.replace(i, bus);
+                return i;
+            }
+        }
+        return -1;
+    }
 
     public int Add(T bus, U extraFunc)
     {

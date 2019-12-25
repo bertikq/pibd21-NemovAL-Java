@@ -113,10 +113,10 @@ public class BusApp {
 		btnUp.setBounds(414, 270, 50, 50);
 		frmBus.getContentPane().add(btnUp);
 		
-				busPanel = new BusPanel();
-				busPanel.setBounds(new Rectangle(0, 0, 528, 389));
-				frmBus.getContentPane().add(busPanel);
-				busPanel.setLayout(null);
+		busPanel = new BusPanel();
+		busPanel.setBounds(new Rectangle(0, 0, 528, 389));
+		frmBus.getContentPane().add(busPanel);
+		busPanel.setLayout(null);
 				
 				
 	}

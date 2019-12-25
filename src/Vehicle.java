@@ -50,5 +50,9 @@ public abstract class Vehicle implements ITransport {
 	public void setPosY(int posY) {
 		this.posY = posY;
 	}
+    public void SetMainColor(Color color)
+    {
+        mainColor = color;
+    }
 	
 }
