@@ -23,4 +23,9 @@ public class DrawDoorsOval implements IExtraFunc {
 			break;
 		}
 	}
+	
+	@Override
+	public String toString() {
+		return this.getClass().getName();
+	}
 }

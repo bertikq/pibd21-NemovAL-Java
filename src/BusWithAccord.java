@@ -17,6 +17,26 @@ public class BusWithAccord extends BaseBus {
         this.paddingAccord = paddingAccord;
         this.widthHalfBus = widthHalfBus;
 	}
+	
+	public BusWithAccord(String save)
+    {
+		super(save);
+		String[] mas = save.split(";");
+        if (mas.length == 10)
+        {
+            speed = Integer.parseInt(mas[0]);
+            mainColor = toColor(mas[1]);
+            radWheel = Float.parseFloat(mas[2]);
+            colorWheels = toColor(mas[3]);
+            typeDoors = toTypeDoors(mas[4]);
+            extraFunc = toExtraFunc(mas[5]);
+            accordColor = toColor(mas[6]);
+            widthAccord = Integer.parseInt(mas[7]);
+            paddingAccord = Integer.parseInt(mas[8]);
+            widthHalfBus = Integer.parseInt(mas[9]);
+            extraColor = Color.BLACK;
+        }
+    }
 
 	@Override
 	public void Draw(Graphics g) {
@@ -65,5 +85,9 @@ public class BusWithAccord extends BaseBus {
 		this.widthHalfBus = widthHalfBus;
 	}
 	
-	
+	@Override
+	public String toString()
+    {
+        return super.toString() + ";" + getNameColor(accordColor)+ ";" + widthAccord + ";" + paddingAccord + ";" + widthHalfBus;
+    }
 }
