@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class MultiLevelParking {
         
     }
     
-    public boolean SaveData(String filename) throws IOException
+    public void SaveData(String filename) throws IOException, ParkingNotFoundException
     {
     	File file = new File(filename);
         if (file.exists())
@@ -76,18 +77,10 @@ public class MultiLevelParking {
 		        }
 		    }
         }
-        return true;
     }
     
-    public boolean SaveLvl(String filename, int numLvl) throws IOException
+    public void SaveLvl(String filename, int numLvl) throws Exception
     {
-    	if (numLvl > terminalStages.size() || numLvl < 0)
-    		return false;
-    	File file = new File(filename);
-        if (file.exists())
-        {
-            file.delete();
-        }
         try (FileWriter fs = new FileWriter(filename, false)) {
         	BusTerminal<ITransport, IExtraFunc> level = terminalStages.get(numLvl);
         	 for (int i = 0; i < countPlaces; i++)
@@ -107,24 +100,21 @@ public class MultiLevelParking {
 		            }
 		        }
         }
-        catch (Exception e) {
-        	return false;
+        catch (Exception ex) {
+			throw ex;
 		}
-        return true;
     }
     
-    public boolean LoadLvl(String filename, int numLvl) throws NumberFormatException, IOException
+    public void LoadLvl(String filename, int numLvl) throws Exception
     {
-    	if (numLvl > terminalStages.size() || numLvl < 0)
-    		return false;
     	File file = new File(filename);
         if (!file.exists())
         {
-            return false;
+            throw new FileNotFoundException();
         }
-        terminalStages.set(numLvl, new BusTerminal<ITransport, IExtraFunc>(countPlaces, pictureWidth, pictureHeight));
         try (BufferedReader fs = new BufferedReader(new FileReader(file)))
         {
+            terminalStages.set(numLvl, new BusTerminal<ITransport, IExtraFunc>(countPlaces, pictureWidth, pictureHeight));
         	String line = "";
             ITransport bus = null;
         	while ((line = fs.readLine()) != null) {
@@ -144,18 +134,20 @@ public class MultiLevelParking {
 	            terminalStages.get(numLvl).setPlace(Integer.parseInt(line.split(":")[0]), bus);
 	        	}
         }
-        catch (Exception e) {
-        	return false;
+        catch (ParkingOccupiedPlaceException ex) {
+			throw ex;
+		} 
+        catch (Exception ex) {
+			throw ex;
 		}
-        return true;
     }
     
-    public boolean LoadData(String filename) throws NumberFormatException, IOException
+    public void LoadData(String filename) throws Exception
     {
     	File file = new File(filename);
         if (!file.exists())
         {
-            return false;
+            throw new FileNotFoundException();
         }
         try (BufferedReader fs = new BufferedReader(new FileReader(file)))
         {
@@ -171,7 +163,7 @@ public class MultiLevelParking {
             }
             else
             {
-                return false;
+                throw new Exception("Неверный формат файла");
             }
             int counter = -1;
             ITransport bus = null;
@@ -187,7 +179,6 @@ public class MultiLevelParking {
                 {
                     continue;
                 }
-                String[] mas = line.split(":");
                 if (line.split(":")[1].contains("BaseBus"))
                 {
                     bus = new BaseBus(line.split(":")[2]);
@@ -199,7 +190,6 @@ public class MultiLevelParking {
                 terminalStages.get(counter).setPlace(Integer.parseInt(line.split(":")[0]), bus);
             }
         }
-        return true;
     }
     
 }

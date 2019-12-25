@@ -13,6 +13,9 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -63,6 +66,8 @@ public class BusTerminalApp {
 	private JMenuItem btnLoad;
 	private JMenuItem btnSaveLvl;
 	private JMenuItem btnLoadLvl;
+	private Logger loggerInfo;
+	private Logger loggerError;
 
 	/**
 	 * Launch the application.
@@ -85,6 +90,23 @@ public class BusTerminalApp {
 	 */
 	public BusTerminalApp() {
 		initialize();
+		loggerInfo = Logger.getLogger("Info");
+		loggerError = Logger.getLogger("Errors");
+		try {
+			FileHandler fhInfo = new FileHandler("infoLogs.txt");
+			FileHandler fhError = new FileHandler("errorLogs.txt");
+			loggerInfo.addHandler(fhInfo);
+			loggerError.addHandler(fhError);
+			loggerInfo.setUseParentHandlers(false);
+			loggerError.setUseParentHandlers(false);
+			SimpleFormatter simpleFormatter = new SimpleFormatter();
+			fhInfo.setFormatter(simpleFormatter);//on up
+			fhError.setFormatter(simpleFormatter);//on up
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		levelTerminal = new MultiLevelParking(countLevel, drawPanel.getWidth(), drawPanel.getHeight());
 		frame.getContentPane().setLayout(null);
 		frame.getContentPane().add(drawPanel);
@@ -172,80 +194,70 @@ public class BusTerminalApp {
 	
 	private void SaveToolStripMenuItem_Click() throws HeadlessException, IOException
     {
-        FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
-        fileDialog.setVisible(true);
-        if (fileDialog.getFile() != null)
-        {
-            if (levelTerminal.SaveData(fileDialog.getDirectory() + fileDialog.getFile()))
-            {
-				JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
-            }
-            else
-            {
-				JOptionPane.showMessageDialog(null,"Не сохранилось");
-            }
+        try {
+            FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+            fileDialog.setVisible(true);
+            levelTerminal.SaveData(fileDialog.getDirectory() + fileDialog.getFile());
+			loggerInfo.info("Сохранено в файл " + fileDialog.getName());
+			JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
         }
+        catch (Exception e) {
+			loggerError.warning(e.getMessage());
+			JOptionPane.showMessageDialog(null,"Не сохранилось");
+		}
     }
 	
 	private void SaveLvl() throws HeadlessException, IOException {
-		FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
-		fileDialog.setVisible(true);
-		if (fileDialog.getFile() != null)
-		{
-		    if (levelTerminal.SaveLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex()))
-		    {
-				JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
-		    }
-		    else
-		    {
-				JOptionPane.showMessageDialog(null,"Не сохранилось");
-		    }
+		try {
+			FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.SAVE);
+			fileDialog.setVisible(true);
+			levelTerminal.SaveLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex());
+			loggerInfo.info("Сохранено в файл " + fileDialog.getName());
+			JOptionPane.showMessageDialog(null,"Сохранение прошло успешно");
+		}
+		catch (Exception e) {
+			loggerError.warning(e.getMessage());
+			JOptionPane.showMessageDialog(null,"Не сохранилось");
 		}
 	}
 	
 	private void LoadLvl() throws HeadlessException, IOException {
-		FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
-        fileDialog.setVisible(true);
-        if (fileDialog.getFile() != null)
-        {
-            try {
-				if (levelTerminal.LoadLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex()))
-				{
-					JOptionPane.showMessageDialog(null,"Загрузили");
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,"Не сохранилось");
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        try {
+    		FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
+            fileDialog.setVisible(true);
+            levelTerminal.LoadLvl(fileDialog.getDirectory() + fileDialog.getFile(), list.getSelectedIndex());
+			JOptionPane.showMessageDialog(null,"Загрузили");
+			loggerInfo.info("Загружено из файла" + fileDialog.getName());
             Draw();
         }
+        catch (ParkingOccupiedPlaceException ex) {
+        	loggerError.warning(ex.getMessage().toString());
+			JOptionPane.showMessageDialog(null,"Занятое место");
+        }
+        catch (Exception ex) {
+        	loggerError.warning(ex.getMessage());
+			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при сохранении");
+		}
 	}
 	
 	private void LoadToolStripMenuItem_Click() throws NumberFormatException, HeadlessException, IOException
     {
-        FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
-        fileDialog.setVisible(true);
-        if (fileDialog.getFile() != null)
-        {
-            try {
-				if (levelTerminal.LoadData(fileDialog.getDirectory() + fileDialog.getFile()))
-				{
-					JOptionPane.showMessageDialog(null,"Загрузили");
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(null,"Не сохранилось");
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+        try {
+            FileDialog fileDialog = new FileDialog(new Frame(), "Save", FileDialog.LOAD);
+            fileDialog.setVisible(true);
+        	levelTerminal.LoadData(fileDialog.getDirectory() + fileDialog.getFile());
+			JOptionPane.showMessageDialog(null,"Загрузили");
+			loggerInfo.info("Загружено из файла" + fileDialog.getName());
             Draw();
         }
+        catch (ParkingOccupiedPlaceException ex) {
+        	loggerError.warning(ex.getMessage().toString());
+			JOptionPane.showMessageDialog(null,"Занятое место");
+        }
+        catch (Exception ex) {
+        	loggerError.warning(ex.getMessage());
+			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при сохранении");
+		}
     }
 	
 	private void ListBoxLevels_SelectedIndexChanged()
@@ -271,26 +283,35 @@ public class BusTerminalApp {
 	}
 	
 	private void GetCar() {
-		
 		if (list.getSelectedIndex() > -1)        
 		{
 			if (inputText.getText() != "")
 	        {
-	            ITransport car = levelTerminal.getBusTerminal(list.getSelectedIndex()).Remove(Integer.parseInt(inputText.getText()));
-	            if (car != null)
-	            {
+				try 
+				{
+		            ITransport car = levelTerminal.getBusTerminal(list.getSelectedIndex()).Remove(Integer.parseInt(inputText.getText()));
 	                car.SetPosition(getBusPanel.getWidth() / 2 - 30, getBusPanel.getHeight() / 2, getBusPanel.getWidth(),
 	                		getBusPanel.getHeight());
 	                getBusPanel.setBus(car);
-	                hashSetBus.add(car); // HashSet
-	            }
-	            else
-	            {
+	                hashSetBus.add(car);
+		            getBusPanel.validate();
+		            getBusPanel.repaint();
+		            Draw();
+				}
+				catch (ParkingNotFoundException ex)
+                {
 	            	getBusPanel.setBus(null);
-	            }
-	            getBusPanel.validate();
-	            getBusPanel.repaint();
-	            Draw();
+		            getBusPanel.validate();
+		            getBusPanel.repaint();
+		            Draw();
+        			JOptionPane.showMessageDialog(null,"Не найдено");
+                	loggerError.warning(ex.getMessage().toString());
+                }
+                catch (Exception ex)
+                {
+        			JOptionPane.showMessageDialog(null,"Не известная ошибка");
+                	loggerError.warning(ex.getMessage().toString());
+                }
 	        }
         }
 	}
@@ -316,11 +337,21 @@ public class BusTerminalApp {
 					@Override
 					public void Invoke(ITransport transport) {
 						if (transport != null && list.getSelectedIndex() > -1) {
-							int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(transport);
-							if (place > -1)
+							try {
+								int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(transport);
+								loggerInfo.info("Добавлен автомобиль " + transport.toString() + " на место " + place);
 								Draw();
-							else
-								JOptionPane.showMessageDialog(null,"Машину не удалось поставить");
+							}
+							catch (ParkingOverflowException ex)
+			                 {
+			                     loggerError.warning(ex.getMessage());
+			                     JOptionPane.showMessageDialog(null,"Переполнение");
+			                 }
+			                 catch (Exception ex)
+			                 {
+			                     loggerError.warning(ex.getMessage());
+			                     JOptionPane.showMessageDialog(null,"Неизвестная ошибка");
+			                 }
 						}
 					}
 				});
