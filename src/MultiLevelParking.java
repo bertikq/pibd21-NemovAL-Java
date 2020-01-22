@@ -83,26 +83,23 @@ public class MultiLevelParking {
     {
         try (FileWriter fs = new FileWriter(filename, false)) {
         	BusTerminal<ITransport, IExtraFunc> level = terminalStages.get(numLvl);
-        	 for (int i = 0; i < countPlaces; i++)
-		        {
-		            ITransport bus = level.getPlace(i);
-		            if (bus != null)
-		            {
-		                if (bus.getClass().getName() == "BaseBus")
-		                {
-		                    fs.write(i + ":BaseBus:");
-		                }
-		                if (bus.getClass().getName() == "BusWithAccord")
-		                {
-		                    fs.write(i + ":BusWithAccord:");
-		                }
-		                fs.write(bus.toString() + "\n");   
-		            }
-		        }
+        	for (int i = 0; i < countPlaces; i++)
+	        {
+	            ITransport bus = level.getPlace(i);
+	            if (bus != null)
+	            {
+	                if (bus.getClass().getName() == "BaseBus")
+	                {
+	                    fs.write(i + ":BaseBus:");
+	                }
+	                if (bus.getClass().getName() == "BusWithAccord")
+	                {
+	                    fs.write(i + ":BusWithAccord:");
+	                }
+	                fs.write(bus.toString() + "\n");   
+	            }
+	        }
         }
-        catch (Exception ex) {
-			throw ex;
-		}
     }
     
     public void LoadLvl(String filename, int numLvl) throws Exception
@@ -118,7 +115,7 @@ public class MultiLevelParking {
         	String line = "";
             ITransport bus = null;
         	while ((line = fs.readLine()) != null) {
-        		if (line == null || line == "")
+	    		if (line == null || line == "")
 		        {
 		            continue;
 		        }
@@ -132,14 +129,8 @@ public class MultiLevelParking {
 	                bus = new BusWithAccord(line.split(":")[2]);
 	            }
 	            terminalStages.get(numLvl).setPlace(Integer.parseInt(line.split(":")[0]), bus);
-	        	}
+        	}
         }
-        catch (ParkingOccupiedPlaceException ex) {
-			throw ex;
-		} 
-        catch (Exception ex) {
-			throw ex;
-		}
     }
     
     public void LoadData(String filename) throws Exception

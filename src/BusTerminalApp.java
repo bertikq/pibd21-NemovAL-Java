@@ -100,8 +100,8 @@ public class BusTerminalApp {
 			loggerInfo.setUseParentHandlers(false);
 			loggerError.setUseParentHandlers(false);
 			SimpleFormatter simpleFormatter = new SimpleFormatter();
-			fhInfo.setFormatter(simpleFormatter);//on up
-			fhError.setFormatter(simpleFormatter);//on up
+			fhInfo.setFormatter(simpleFormatter);
+			fhError.setFormatter(simpleFormatter);
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -236,7 +236,7 @@ public class BusTerminalApp {
         }
         catch (Exception ex) {
         	loggerError.warning(ex.getMessage());
-			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при сохранении");
+			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при загрузке");
 		}
 	}
 	
@@ -256,7 +256,7 @@ public class BusTerminalApp {
         }
         catch (Exception ex) {
         	loggerError.warning(ex.getMessage());
-			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при сохранении");
+			JOptionPane.showMessageDialog(null,"Неизвестная ошибка при загрузке");
 		}
     }
 	
