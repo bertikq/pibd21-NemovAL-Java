@@ -25,32 +25,34 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         maxCount = size;
     }
 	
-	public T getPlace(int ind) {
+	public T getPlace(int ind) throws ParkingNotFoundException {
 		if (places.containsKey(ind))
         {
             return places.get(ind);
         }
-        return null;
+		return null;
 	}
 	
 	/**
 	 * @param bus
 	 * @return
+	 * @throws ParkingOccupiedPlaceException 
 	 */
-	public void setPlace(int ind, T value) {
+	public void setPlace(int ind, T value) throws ParkingOccupiedPlaceException {
 		if (CheckFreePlace(ind))
         {
             places.put(ind, value);
             places.get(ind).SetPosition(widthSizePlace / 2 + ind / 5 * widthSizePlace + 5 - 50, 
                 ind % 5 * heightSizePlace + heightSizePlace / 2, WidthWindow, HeightWindow);
         }
+        else throw new ParkingOccupiedPlaceException(ind);
 	}
 	
-	public int Add(T bus)
+	public int Add(T bus) throws ParkingOverflowException
     {
 		if (places.size() == maxCount)
 		{
-			return -1;
+            throw new ParkingOverflowException();
 	    }
         for (int i = 0; i < maxCount; i++)
         {
@@ -63,14 +65,14 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
                 return i;
             }
         }
-        return -1;
+        throw new ParkingOverflowException();
     }
 
-    public int Add(T bus, U extraFunc)
+    public int Add(T bus, U extraFunc) throws ParkingOverflowException
     {
 		if (places.size() == maxCount)
 		{
-			return -1;
+            throw new ParkingOverflowException();
 	    }
         for (int i = 0; i < maxCount; i++)
         {
@@ -84,7 +86,7 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
                 return i;
             }
         }
-        return -1;
+        throw new ParkingOverflowException();
     }
     
     public boolean BolsheRavno(BusTerminal<ITransport, IExtraFunc> term) {
@@ -99,15 +101,17 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     	return false;
     }
 
-    public T Remove(int index)
+    public T Remove(int index) throws ParkingNotFoundException
     {
+    	if (index < 0 || index > maxCount)
+            throw new ParkingNotFoundException(index);
         if (!CheckFreePlace(index))
         {
             T bus = places.get(index);
             places.replace(index, null);
             return bus;
         }
-        return null;
+        throw new ParkingNotFoundException(index);
     }
 
     public void Draw(Graphics g)
