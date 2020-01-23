@@ -121,6 +121,26 @@ public class BusTerminalApp {
 		frame.getContentPane().add(list);
 		list.setModel(dlm);
 		
+		JButton button = new JButton("\u0421\u043E\u0440\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+	            levelTerminal.Sort();
+	            Draw();
+	            loggerInfo.info("Сортировка уровней");
+			}
+		});
+		button.setBounds(567, 252, 314, 34);
+		frame.getContentPane().add(button);
+		
+		JButton getFieldsButton = new JButton("\u041F\u043E\u043B\u044F \u0430\u0432\u0442\u043E");
+		getFieldsButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				levelTerminal.getFields();
+			}
+		});
+		getFieldsButton.setBounds(613, 296, 85, 21);
+		frame.getContentPane().add(getFieldsButton);
+		
 		menuBar = new JMenuBar();
 		frame.setJMenuBar(menuBar);
 		
@@ -271,7 +291,7 @@ public class BusTerminalApp {
 		drawPanel.repaint();
 	}
 	
-	private void ParkingBaseBus() {
+	private void ParkingBaseBus() throws ParkingOverflowException, ParkingAlreadyHaveException {
 		if (list.getSelectedIndex() > -1)
         {
 			JColorChooser colorChooser = new JColorChooser();
@@ -328,7 +348,7 @@ public class BusTerminalApp {
 		drawPanel.setBounds(0, 0, 557, 599);
 		
 		createBus = new JButton("\u0417\u0430\u043A\u0430\u0437\u0430\u0442\u044C");
-		createBus.setBounds(564, 249, 314, 62);
+		createBus.setBounds(564, 180, 314, 62);
 		
 		createBus.addActionListener(new ActionListener() {
 			@Override
@@ -337,21 +357,27 @@ public class BusTerminalApp {
 					@Override
 					public void Invoke(ITransport transport) {
 						if (transport != null && list.getSelectedIndex() > -1) {
-							try {
+							try 
+							{
 								int place = levelTerminal.getBusTerminal(list.getSelectedIndex()).Add(transport);
 								loggerInfo.info("Добавлен автомобиль " + transport.toString() + " на место " + place);
 								Draw();
 							}
 							catch (ParkingOverflowException ex)
-			                 {
+			                {
 			                     loggerError.warning(ex.getMessage());
 			                     JOptionPane.showMessageDialog(null,"Переполнение");
-			                 }
-			                 catch (Exception ex)
-			                 {
+			                }
+							catch(ParkingAlreadyHaveException ex) 
+							{
+								loggerError.warning(ex.getMessage());
+								JOptionPane.showMessageDialog(null, ex.getMessage());
+							}
+							catch (Exception ex)
+							{
 			                     loggerError.warning(ex.getMessage());
 			                     JOptionPane.showMessageDialog(null,"Неизвестная ошибка");
-			                 }
+							}
 						}
 					}
 				});

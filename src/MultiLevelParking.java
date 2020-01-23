@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -59,21 +61,17 @@ public class MultiLevelParking {
 	    fs.write("\n");
 	    for (BusTerminal<ITransport, IExtraFunc> level : terminalStages) {
 	        fs.write("Level\n");
-	        for (int i = 0; i < countPlaces; i++)
+	        for (ITransport bus : level)
 	        {
-	            ITransport bus = level.getPlace(i);
-	            if (bus != null)
-	            {
-	                if (bus.getClass().getName() == "BaseBus")
-	                {
-	                    fs.write(i + ":BaseBus:");
-	                }
-	                if (bus.getClass().getName() == "BusWithAccord")
-	                {
-	                    fs.write(i + ":BusWithAccord:");
-	                }
-	                fs.write(bus.toString() + "\n");   
-	            }
+                if (bus.getClass().getName() == "BaseBus")
+                {
+                    fs.write(level.GetKey() + ":BaseBus:");
+                }
+                if (bus.getClass().getName() == "BusWithAccord")
+                {
+                    fs.write(level.GetKey() + ":BusWithAccord:");
+                }
+                fs.write(bus.toString() + "\n"); 
 	        }
 	    }
 	    fs.close();
@@ -179,5 +177,34 @@ public class MultiLevelParking {
             terminalStages.get(counter).setPlace(Integer.parseInt(line.split(":")[0]), bus);
         }
         fs.close();
+    }
+    
+    public String getFields() {
+    	String answer = "";
+		for(BusTerminal<ITransport, IExtraFunc> level : terminalStages)
+		{
+			for(ITransport bus : level) {
+				if (bus instanceof BaseBus) {
+					String curBus = "";
+					for (String field : (BaseBus)bus) {
+						curBus += field + " ";
+					}
+					answer += curBus + "\n";
+				}
+				else if (bus instanceof BusWithAccord) {
+					String curBus = "";
+					for (String field : (BusWithAccord)bus) {
+						curBus += field + " ";
+					}
+					answer += curBus + "\n";
+				}
+			}
+		}
+		return answer;
+	}
+
+    public void Sort()
+    {
+        Collections.sort(terminalStages);
     }
 }

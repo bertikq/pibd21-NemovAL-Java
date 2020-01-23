@@ -3,9 +3,10 @@ import java.awt.Graphics;
 import java.lang.reflect.Array;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
+public class BusTerminal<T extends ITransport, U extends IExtraFunc>  implements Comparable<BusTerminal<T, U>>, Iterable<T>, Iterator<T>{
 	
 	private Map<Integer, T> places;
     
@@ -16,6 +17,8 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
 
     private final int widthSizePlace = 200;
     private final int heightSizePlace = 50;
+
+    private int currentIndex;
     
 	public BusTerminal(int size, int widthWindow, int heightWindow)
     {
@@ -23,6 +26,11 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         WidthWindow = widthWindow;
         HeightWindow = heightWindow;
         maxCount = size;
+        currentIndex = -1;
+    }
+	
+	public int GetKey() {
+    	return (int)places.keySet().toArray()[currentIndex];
     }
 	
 	public T getPlace(int ind) throws ParkingNotFoundException {
@@ -30,7 +38,7 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         {
             return places.get(ind);
         }
-		return null;
+        throw new ParkingNotFoundException(ind);
 	}
 	
 	/**
@@ -48,12 +56,16 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         else throw new ParkingOccupiedPlaceException(ind);
 	}
 	
-	public int Add(T bus) throws ParkingOverflowException
+	public int Add(T bus) throws ParkingOverflowException, ParkingAlreadyHaveException
     {
 		if (places.size() == maxCount)
 		{
             throw new ParkingOverflowException();
 	    }
+        if (places.containsValue(bus))
+        {
+            throw new ParkingAlreadyHaveException();
+        }
         for (int i = 0; i < maxCount; i++)
         {
             if (CheckFreePlace(i))
@@ -68,12 +80,16 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
         throw new ParkingOverflowException();
     }
 
-    public int Add(T bus, U extraFunc) throws ParkingOverflowException
+    public int Add(T bus, U extraFunc) throws ParkingOverflowException, ParkingAlreadyHaveException
     {
 		if (places.size() == maxCount)
 		{
             throw new ParkingOverflowException();
 	    }
+        if (places.containsValue(bus))
+        {
+            throw new ParkingAlreadyHaveException();
+        }
         for (int i = 0; i < maxCount; i++)
         {
             if (CheckFreePlace(i))
@@ -149,4 +165,61 @@ public class BusTerminal<T extends ITransport, U extends IExtraFunc> {
     public ITransport getTransport(int ind) {
 		return places.get(ind);
     }
+
+	@Override
+	public boolean hasNext() {
+		if (currentIndex + 1 >= places.size())
+		{
+			currentIndex = -1;
+			return false;
+		} 
+		else {
+			return true;
+		}
+	}
+
+	@Override
+	public T next() {
+		return places.get(++currentIndex); 
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return this;
+	}
+
+	@Override
+	public int compareTo(BusTerminal<T, U> other) {
+		if (places.size() > other.places.size())
+        {
+            return -1;
+        }
+        else if (places.size() < other.places.size())
+        {
+            return 1;
+        }
+        else if (places.size() > 0) {
+        	Object[] thisKeys = places.keySet().toArray();
+        	for (int i = 0; i < places.size(); ++i)
+            {
+                if (places.get(thisKeys[i]).getClass().getName().equals("BaseBus") && other.places.get(thisKeys[i]).getClass().getName().equals("BusWithAccord")) 
+                {
+                	return 1;
+                }
+                if (places.get(thisKeys[i]).getClass().getName().equals("BusWithAccord") && other.places.get(thisKeys[i]).getClass().getName().equals("BaseBus")) 
+                {
+                	return -1;
+                }
+                if (places.get(thisKeys[i]).getClass().getName().equals("BaseBus") && other.places.get(thisKeys[i]).getClass().getName().equals("BaseBus"))
+                {
+                    return ((BaseBus)places.get(thisKeys[i])).compareTo((BaseBus)other.places.get(thisKeys[i]));
+                }
+                if(places.get(thisKeys[i]).getClass().getName().equals("BusWithAccord") && other.places.get(thisKeys[i]).getClass().getName().equals("BusWithAccord")) 
+                {
+                    return ((BusWithAccord)places.get(thisKeys[i])).compareTo((BusWithAccord)other.places.get(thisKeys[i]));
+                }
+            }
+        }
+        return 0;
+	}
 }
