@@ -1,7 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Iterator;
 
-public class BaseBus extends Vehicle {
+public class BaseBus extends Vehicle implements Comparable<BaseBus>, Iterable<String>, Iterator<String> {
 
 	protected final int width = 100;
 	protected final int height = 40;
@@ -12,6 +13,8 @@ public class BaseBus extends Vehicle {
 	protected Color extraColor;
 	
 	protected Color colorWheels;
+	
+	private int currentIndex;
 	
 	public BaseBus(int speed, Color mainColor, float radWheel, Color colorWheels, IExtraFunc extraFunc, TypeDoors typeDoors, Color extraColor) {
 		this.radWheel = radWheel;
@@ -136,4 +139,85 @@ public class BaseBus extends Vehicle {
     {
         return speed + ";" + getNameColor(mainColor) + ";" + radWheel + ";" + getNameColor(colorWheels) + ";" + parseTypeDoors(typeDoors) + ";" + extraFunc.toString();
     }
+	
+	public int compareTo(BaseBus other) {
+		if (other == null)
+	    {
+	        return 1;
+	    }
+	    if (speed != other.speed)
+	    {
+	        return Integer.compare(speed, other.speed);
+	    }
+	    if (mainColor != other.mainColor)
+	    {
+	        return Integer.compare(mainColor.getRGB(), other.mainColor.getRGB());
+	    }
+	    if (radWheel != other.radWheel)
+	    {
+	        return Float.compare(radWheel, other.radWheel);
+	    }
+	    if (colorWheels != other.colorWheels)
+	    {
+	        return Integer.compare(colorWheels.getRGB(), other.colorWheels.getRGB());
+	    }
+	    return 0;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+	    {
+	        return false;
+	    }
+		if (getClass() != obj.getClass())
+			return false;
+		else {
+			return Equals((BaseBus)obj);
+		}
+	}
+	
+	public boolean Equals(BaseBus other)
+    {
+        if (other == null)
+        {
+            return false;
+        }
+        if (speed != other.speed)
+        {
+            return false;
+        }
+        if (mainColor != other.mainColor)
+        {
+            return false;
+        }
+        if (radWheel != other.radWheel)
+        {
+            return false;
+        }
+        if (colorWheels != other.colorWheels)
+        {
+            return false;
+        }
+        return true;
+    }
+
+	@Override
+	public boolean hasNext() {
+		if (currentIndex + 1 >= toString().split(";").length) {
+			currentIndex = -1;
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String next() {
+		return toString().split(";")[++currentIndex];
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return this;
+	}
 }
